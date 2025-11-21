@@ -1,0 +1,326 @@
+\documentclass[11pt,a4paper]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%% Credit %%%%%%%%%%%%%%%%%%%%%%%%
+
+% template ini dibuat oleh martin.manullang@if.itera.ac.id untuk dipergunakan oleh seluruh sivitas akademik itera.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE starts HERE %%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage[final]{microtype}
+\captionsetup[table]{name=Tabel}
+\captionsetup[figure]{name=Gambar}
+\usepackage{tabulary}
+\usepackage{minted}
+% \usepackage{amsmath}
+\usepackage{fancyhdr}
+% \usepackage{amssymb}
+% \usepackage{amsthm}
+\usepackage{placeins}
+% \usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[all]{xy}
+\usepackage{tikz}
+\usepackage{verbatim}
+\usepackage[left=2cm,right=2cm,top=3cm,bottom=2.5cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{psfrag}
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{beramono}
+% Enable inserting code into the document
+\usepackage{listings}
+\usepackage{xcolor}
+% custom color & style for listing
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{LightGray}{gray}{0.9}
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{green},
+	keywordstyle=\color{codegreen},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2
+}
+\lstset{style=mystyle}
+\renewcommand{\lstlistingname}{Kode}
+%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGE ends HERE %%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Data Diri %%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\student}{\textbf{Ferdana Al Hakim (122140012)}}
+\newcommand{\course}{\textbf{Deep Learning}}
+\newcommand{\assignment}{\textbf{Laporan Perbandingan Vision Transformer}}
+
+%%%%%%%%%%%%%%%%%%% using theorem style %%%%%%%%%%%%%%%%%%%%
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{exa}[thm]{Example}
+\newtheorem{rem}[thm]{Remark}
+\newtheorem{coro}[thm]{Corollary}
+\newtheorem{quest}{Question}[section]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{lipsum}%% a garbage package you don't need except to create examples.
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Ferdana Al Hakim (122140012)}
+\rhead{ \thepage}
+\cfoot{\textbf{Perbandingan Vision Transformer pada Dataset CIFAR-100}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+%%%%%%%%%%%%%%  Shortcut for usual set of numbers  %%%%%%%%%%%
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\setlength\headheight{14pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+\begin{document}
+\thispagestyle{empty}
+\begin{center}
+	\includegraphics[scale = 0.15]{Figure/ifitera-header.png}
+	\vspace{0.1cm}
+\end{center}
+\noindent
+\rule{17cm}{0.2cm}\\[0.3cm]
+Nama: \student \hfill Tugas Ke: \assignment\\[0.1cm]
+Mata Kuliah: \course \hfill Tanggal: 21 November 2025\\
+\rule{17cm}{0.05cm}
+\vspace{0.1cm}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BODY DOCUMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Pendahuluan}
+Vision Transformer (ViT) telah merevolusi bidang computer vision dengan mengadaptasi arsitektur Transformer yang awalnya dirancang untuk Natural Language Processing (NLP) ke dalam domain pemrosesan gambar \cite{dosovitskiy2021image}. Berbeda dengan Convolutional Neural Networks (CNN) tradisional yang mengandalkan operasi konvolusi lokal, Vision Transformer membagi gambar menjadi patch-patch kecil dan memprosesnya menggunakan mekanisme self-attention, memungkinkan model untuk menangkap dependensi global dalam gambar.
+
+Penelitian ini bertujuan untuk membandingkan performa tiga arsitektur Vision Transformer yang populer: Vision Transformer (ViT) \cite{dosovitskiy2021image}, Swin Transformer \cite{liu2021swin}, dan Data-efficient Image Transformer (DeiT) \cite{touvron2021training} pada dataset CIFAR-100 \cite{krizhevsky2009learning}. Perbandingan dilakukan berdasarkan beberapa metrik evaluasi, termasuk akurasi, presisi, recall, F1-score, waktu inferensi, dan throughput.
+
+Dataset CIFAR-100 terdiri dari 60.000 gambar berwarna berukuran 32x32 piksel yang terbagi dalam 100 kelas, dengan masing-masing kelas memiliki 600 gambar. Dataset ini merupakan tantangan yang menarik untuk menguji kemampuan model Vision Transformer dalam klasifikasi gambar multi-kelas dengan resolusi rendah.
+
+\section{Metodologi}
+
+\subsection{Dataset dan Preprocessing}
+Eksperimen ini menggunakan dataset CIFAR-100 yang terdiri dari 50.000 gambar untuk pelatihan dan 10.000 gambar untuk pengujian. Setiap gambar memiliki dimensi 32x32 piksel dan termasuk dalam salah satu dari 100 kelas yang berbeda.
+
+Untuk preprocessing data, dilakukan beberapa transformasi:
+\begin{itemize}
+    \item \textbf{Data Training:} Resize ke 224x224, Random Crop dengan padding 4, Random Horizontal Flip, normalisasi dengan mean=[0.5071, 0.4867, 0.4408] dan std=[0.2675, 0.2565, 0.2761]
+    \item \textbf{Data Testing:} Resize ke 224x224, normalisasi dengan mean dan std yang sama dengan data training
+\end{itemize}
+
+\subsection{Arsitektur Model}
+Tiga arsitektur Vision Transformer yang dibandingkan dalam penelitian ini adalah:
+
+\subsubsection{Vision Transformer (ViT)}
+ViT adalah arsitektur Transformer murni untuk klasifikasi gambar yang diperkenalkan oleh Dosovitskiy et al. \cite{dosovitskiy2021image}. Model ini membagi gambar input menjadi patch berukuran 16x16 piksel, kemudian setiap patch diproyeksikan ke dalam embedding space dan diproses menggunakan Transformer encoder standar. Model yang digunakan adalah \texttt{vit\_base\_patch16\_224} dengan total 85.88 juta parameter.
+
+\subsubsection{Swin Transformer}
+Swin Transformer adalah arsitektur hierarkis yang menggunakan shifted windows untuk menghitung self-attention \cite{liu2021swin}. Pendekatan ini mengurangi kompleksitas komputasi dari kuadratik menjadi linear terhadap ukuran gambar. Model yang digunakan adalah \texttt{swin\_base\_patch4\_window7\_224} dengan total 86.85 juta parameter.
+
+\subsubsection{Data-efficient Image Transformer (DeiT)}
+DeiT adalah varian dari ViT yang dirancang untuk lebih efisien dalam hal data training \cite{touvron2021training}. Model ini menggunakan teknik distilasi pengetahuan (knowledge distillation) untuk meningkatkan performa dengan data training yang lebih sedikit. Model yang digunakan adalah \texttt{deit\_base\_patch16\_224} dengan total 85.88 juta parameter.
+
+\subsection{Konfigurasi Training}
+Semua model dilatih dengan konfigurasi yang sama untuk memastikan perbandingan yang adil:
+\begin{itemize}
+    \item \textbf{Epochs:} 5
+    \item \textbf{Batch Size:} 32
+    \item \textbf{Learning Rate:} 1e-4
+    \item \textbf{Optimizer:} AdamW dengan weight decay 0.01
+    \item \textbf{Scheduler:} Cosine Annealing Learning Rate
+    \item \textbf{Loss Function:} Cross Entropy Loss
+    \item \textbf{Hardware:} Tesla P100-PCIE-16GB GPU
+\end{itemize}
+
+\subsection{Metrik Evaluasi}
+Performa model dievaluasi menggunakan metrik-metrik berikut:
+\begin{itemize}
+    \item \textbf{Accuracy:} Persentase prediksi yang benar dari total prediksi
+    \item \textbf{Precision:} Rasio true positive terhadap total prediksi positif (weighted average)
+    \item \textbf{Recall:} Rasio true positive terhadap total sampel positif aktual (weighted average)
+    \item \textbf{F1-Score:} Harmonic mean dari precision dan recall (weighted average)
+    \item \textbf{Inference Time:} Waktu rata-rata untuk memproses satu gambar (dalam milidetik)
+    \item \textbf{Throughput:} Jumlah gambar yang dapat diproses per detik (frames per second)
+\end{itemize}
+
+\section{Hasil Eksperimen}
+
+\subsection{Performa Model}
+Tabel \ref{tab-results} menunjukkan ringkasan performa dari ketiga model Vision Transformer yang diuji pada dataset CIFAR-100.
+
+\begin{table}[h]
+\caption{Ringkasan Hasil Eksperimen}
+\label{tab-results}
+\centering
+\resizebox{16cm}{!}{%
+\begin{tabular}{lccccccc}
+\hline
+\textbf{Model} & \textbf{Parameters} & \textbf{Size} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Inference Time} \\
+               & \textbf{(M)}        & \textbf{(MB)} & \textbf{(\%)}     & \textbf{(\%)}      & \textbf{(\%)}   & \textbf{(\%)}     & \textbf{(ms)}           \\ \hline
+ViT            & 85.88               & 327.59        & 88.80             & 89.08              & 88.80           & 88.83             & 5.71                    \\
+Swin Transformer & 86.85             & 331.29        & \textbf{92.05}    & \textbf{92.17}     & \textbf{92.05}  & \textbf{92.06}    & 6.52                    \\
+DeiT           & 85.88               & 327.59        & 89.74             & 89.92              & 89.74           & 89.75             & \textbf{5.71}           \\ \hline
+\end{tabular}
+}
+\end{table}
+
+Dari Tabel \ref{tab-results}, dapat dilihat bahwa \textbf{Swin Transformer} mencapai akurasi tertinggi sebesar 92.05\%, diikuti oleh DeiT dengan 89.74\% dan ViT dengan 88.80\%. Swin Transformer juga mengungguli model lainnya dalam metrik precision, recall, dan F1-score. Namun, dalam hal kecepatan inferensi, ViT dan DeiT lebih unggul dengan waktu inferensi 5.71 ms dibandingkan Swin Transformer yang memerlukan 6.52 ms.
+
+\subsection{Visualisasi Training History}
+Gambar \ref{fig:training-history} menunjukkan grafik training dan validation loss serta accuracy selama 5 epoch training untuk ketiga model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figure/training_history.png}
+    \caption{Training History untuk ViT, Swin Transformer, dan DeiT}
+    \label{fig:training-history}
+\end{figure}
+
+Dari Gambar \ref{fig:training-history}, dapat diamati bahwa semua model menunjukkan penurunan loss yang konsisten dan peningkatan akurasi selama training. Namun, terdapat gap yang signifikan antara training accuracy dan validation accuracy, mengindikasikan adanya overfitting. Swin Transformer menunjukkan validation accuracy yang paling stabil dan tertinggi di antara ketiga model.
+
+\subsection{Perbandingan Metrik Klasifikasi}
+Gambar \ref{fig:metrics-comparison} menunjukkan perbandingan visual dari metrik-metrik evaluasi (accuracy, precision, recall, F1-score) untuk ketiga model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figure/metrics_comparison.png}
+    \caption{Perbandingan Metrik Klasifikasi}
+    \label{fig:metrics-comparison}
+\end{figure}
+
+Swin Transformer secara konsisten mengungguli kedua model lainnya di semua metrik klasifikasi. Perbedaan performa antara Swin Transformer dan DeiT adalah sekitar 2.3\%, sedangkan perbedaan dengan ViT adalah sekitar 3.3\%.
+
+\subsection{Perbandingan Parameter dan Ukuran Model}
+Gambar \ref{fig:parameter-comparison} menunjukkan perbandingan jumlah parameter dan ukuran model dalam megabytes.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figure/parameter_comparison.png}
+    \caption{Perbandingan Parameter dan Ukuran Model}
+    \label{fig:parameter-comparison}
+\end{figure}
+
+Swin Transformer memiliki jumlah parameter sedikit lebih banyak (86.85M) dibandingkan ViT dan DeiT (85.88M). Perbedaan ini tidak signifikan (sekitar 1.1\%), namun berkontribusi pada peningkatan performa yang cukup substansial.
+
+\subsection{Perbandingan Waktu Inferensi}
+Gambar \ref{fig:inference-comparison} menunjukkan perbandingan waktu inferensi rata-rata dan throughput untuk ketiga model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{Figure/inference_time_comparison.png}
+    \caption{Perbandingan Waktu Inferensi dan Throughput}
+    \label{fig:inference-comparison}
+\end{figure}
+
+ViT dan DeiT memiliki waktu inferensi yang identik (5.71 ms) dengan throughput sekitar 175 fps. Swin Transformer sedikit lebih lambat dengan waktu inferensi 6.52 ms dan throughput 153.40 fps. Perbedaan kecepatan ini (sekitar 14\%) dapat diterima mengingat peningkatan akurasi yang signifikan.
+
+\subsection{Confusion Matrix}
+Gambar \ref{fig:confusion-vit}, \ref{fig:confusion-swin}, dan \ref{fig:confusion-deit} menunjukkan confusion matrix untuk masing-masing model pada dataset testing.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figure/confusion_matrix_vit.png}
+    \caption{Confusion Matrix - Vision Transformer (ViT)}
+    \label{fig:confusion-vit}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figure/confusion_matrix_swin_transformer.png}
+    \caption{Confusion Matrix - Swin Transformer}
+    \label{fig:confusion-swin}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figure/confusion_matrix_deit.png}
+    \caption{Confusion Matrix - Data-efficient Image Transformer (DeiT)}
+    \label{fig:confusion-deit}
+\end{figure}
+
+Dari confusion matrix dapat diamati bahwa Swin Transformer memiliki distribusi prediksi yang lebih terkonsentrasi pada diagonal (prediksi benar), mengindikasikan performa klasifikasi yang lebih baik dibandingkan ViT dan DeiT.
+
+\section{Pembahasan}
+
+\subsection{Analisis Performa Model}
+Hasil eksperimen menunjukkan bahwa Swin Transformer mencapai performa terbaik dengan akurasi 92.05\% pada dataset CIFAR-100. Keunggulan Swin Transformer dapat dijelaskan oleh beberapa faktor:
+
+\begin{enumerate}
+    \item \textbf{Hierarchical Architecture:} Swin Transformer menggunakan arsitektur hierarkis yang memungkinkan model untuk menangkap fitur pada berbagai skala, mirip dengan CNN tradisional namun dengan keunggulan self-attention mechanism.
+
+    \item \textbf{Shifted Window Attention:} Mekanisme shifted window mengurangi kompleksitas komputasi sambil tetap mempertahankan kemampuan untuk menangkap dependensi global. Hal ini memungkinkan model untuk lebih efisien dalam memproses informasi spasial.
+
+    \item \textbf{Inductive Bias:} Meskipun Transformer umumnya memiliki inductive bias yang lebih sedikit dibandingkan CNN, arsitektur hierarkis Swin Transformer memberikan struktur yang lebih cocok untuk data visual.
+\end{enumerate}
+
+ViT, meskipun merupakan arsitektur yang lebih sederhana dan lebih cepat, menunjukkan performa yang sedikit lebih rendah (88.80\%). Hal ini kemungkinan disebabkan oleh kurangnya inductive bias spasial yang dimiliki oleh arsitektur hierarkis seperti Swin Transformer.
+
+DeiT menunjukkan performa yang berada di tengah-tengah (89.74\%), yang konsisten dengan desainnya untuk efisiensi data. Meskipun DeiT dirancang untuk bekerja dengan baik pada dataset yang lebih kecil, pada eksperimen ini dengan CIFAR-100 yang memiliki 50.000 sampel training, keunggulannya tidak terlalu signifikan dibandingkan ViT.
+
+\subsection{Trade-off Akurasi vs Kecepatan}
+Terdapat trade-off yang jelas antara akurasi dan kecepatan inferensi:
+\begin{itemize}
+    \item Swin Transformer menawarkan akurasi tertinggi (92.05\%) namun dengan kecepatan inferensi yang sedikit lebih lambat (6.52 ms)
+    \item ViT dan DeiT menawarkan kecepatan inferensi yang lebih cepat (5.71 ms) namun dengan akurasi yang sedikit lebih rendah
+\end{itemize}
+
+Perbedaan waktu inferensi sekitar 14\% antara Swin Transformer dan ViT/DeiT dapat diterima untuk aplikasi yang mengutamakan akurasi, seperti medical imaging atau quality control. Sebaliknya, untuk aplikasi real-time seperti autonomous driving atau video surveillance, ViT atau DeiT mungkin lebih cocok.
+
+\subsection{Overfitting}
+Semua model menunjukkan tanda-tanda overfitting yang signifikan, dengan training accuracy mencapai 99\% sementara validation accuracy berada di kisaran 88-92\%. Beberapa strategi yang dapat digunakan untuk mengurangi overfitting:
+\begin{itemize}
+    \item Augmentasi data yang lebih agresif
+    \item Regularisasi yang lebih kuat (weight decay, dropout)
+    \item Early stopping berdasarkan validation loss
+    \item Training dengan epoch yang lebih sedikit
+    \item Menggunakan teknik seperti mixup atau cutmix
+\end{itemize}
+
+\subsection{Efisiensi Parameter}
+Ketiga model memiliki jumlah parameter yang relatif serupa (85-87 juta parameter), namun menunjukkan performa yang berbeda. Hal ini mengindikasikan bahwa arsitektur dan bagaimana parameter tersebut diorganisir lebih penting daripada jumlah parameter semata. Swin Transformer, dengan hanya 1.1\% lebih banyak parameter dibandingkan ViT, mampu mencapai peningkatan akurasi sebesar 3.3\%.
+
+\section{Kesimpulan}
+Penelitian ini membandingkan tiga arsitektur Vision Transformer (ViT, Swin Transformer, dan DeiT) pada dataset CIFAR-100. Berdasarkan hasil eksperimen, dapat disimpulkan bahwa:
+
+\begin{enumerate}
+    \item \textbf{Swin Transformer} mencapai performa terbaik dengan akurasi 92.05\%, precision 92.17\%, recall 92.05\%, dan F1-score 92.06\%, mengungguli ViT dan DeiT secara signifikan.
+
+    \item \textbf{ViT dan DeiT} menawarkan kecepatan inferensi yang lebih tinggi (5.71 ms atau 175 fps) dibandingkan Swin Transformer (6.52 ms atau 153.40 fps), dengan perbedaan sekitar 14\%.
+
+    \item Terdapat \textbf{trade-off antara akurasi dan kecepatan}: Swin Transformer lebih akurat namun sedikit lebih lambat, sementara ViT dan DeiT lebih cepat namun dengan akurasi yang sedikit lebih rendah.
+
+    \item Semua model menunjukkan \textbf{overfitting yang signifikan}, mengindikasikan perlunya strategi regularisasi yang lebih baik atau augmentasi data yang lebih agresif.
+
+    \item \textbf{Arsitektur hierarkis} dari Swin Transformer terbukti lebih efektif untuk klasifikasi gambar dibandingkan arsitektur Transformer murni seperti ViT dan DeiT, terutama pada dataset dengan resolusi rendah seperti CIFAR-100.
+\end{enumerate}
+
+\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{Referensi}
+\end{document}
